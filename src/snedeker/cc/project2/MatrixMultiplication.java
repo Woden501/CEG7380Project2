@@ -21,8 +21,8 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 public class MatrixMultiplication {
 	
 	/**
-	 * This is the Mapper component.  It will take the input data and separate it into
-	 * individual entries which will later be combined and averaged.
+	 * This is the Mapper component.  It will take the input data and create the multiple entries 
+	 * per matrix component that will allow the result matrix to be calculated.
 	 * 
 	 * @author Colby Snedeker
 	 *
@@ -34,8 +34,8 @@ public class MatrixMultiplication {
 		
 		/**
 		 * This is the map function.  In this function the lines are read and tokenized.  The 
-		 * date and price information are placed into a Time_Series object.  This object is then
-		 * placed into the Mapper context as the value and the company code as the key.
+		 * information for the specified matrix component will be formatted i or k times.  The
+		 * formatted data is then written out to be grouped by their key (i,k).
 		 */
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			// Read in the first line
@@ -72,7 +72,8 @@ public class MatrixMultiplication {
 	
 	/**
 	 * This is the Reducer component.  It will take the Mapped, Shuffled, and Sorted data,
-	 * and output the means.
+	 * and calculate the sum of all the multiplied together components which results in 
+	 * the value that constitutes the key (i,k) value position in the result matrix.
 	 * 
 	 * @author Colby Snedeker
 	 *
@@ -80,10 +81,10 @@ public class MatrixMultiplication {
 	public static class Reduce extends Reducer<Text, Text, Text, DoubleWritable> {
 
 		/**
-		 * This is the reduce function.  It iterates through all of the Time_Series values to 
-		 * compute the 3 and 4 window means.  It then takes those means and outputs a key 
-		 * value pair to the Reducer context that consists of the company code as the key, 
-		 * and a string providing the means in a formatted way as the value.
+		 * This is the reduce function.  It takes all of the entries for this (i,k) 
+		 * position of the result matrix, sorts them by j value, multiplies the 
+		 * matching pairs, and sums the results together to find the value to place
+		 * into the resultant matrix.
 		 */
 		public void reduce(Text key, Iterable<Text> multiplicationValues, Context context) throws IOException, InterruptedException {
 			
