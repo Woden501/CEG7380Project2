@@ -87,8 +87,6 @@ public class MatrixMultiplication {
 		 */
 		public void reduce(Text key, Iterable<Text> multiplicationValues, Context context) throws IOException, InterruptedException {
 			
-			DoubleWritable output = new DoubleWritable();
-			
 			TreeMap<Integer, ArrayList<Double>> jOrderedValues = new TreeMap<>();
 			double sum = 0;
 			
@@ -118,9 +116,7 @@ public class MatrixMultiplication {
 				sum += values.get(0) * values.get(1);
 			}
 			
-			output.set(sum);
-			
-			context.write(key, output);
+			context.write(key, new DoubleWritable(sum));
 		}
 	}
 	
@@ -133,11 +129,14 @@ public class MatrixMultiplication {
 	public static void main(String[] args) throws Exception {
 		//Get configuration object and set a job name
 		Configuration conf = new Configuration();
-		conf.set("window.size", args[0]);
+		conf.set("result.i", args[0]);
+		conf.set("result.k", args[1]);
 		conf.set("mapred.textoutputformat.separator", ",");
 		Job job = new Job(conf, "matrixMultiplication");
 		job.setJarByClass(snedeker.cc.project2.MatrixMultiplication.class);
 		
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(Text.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(DoubleWritable.class);
 		//Set key, output classes for the job (same as output classes for Reducer)
@@ -151,8 +150,8 @@ public class MatrixMultiplication {
 		job.setOutputFormatClass(TextOutputFormat.class);
 		//job.setNumReduceTasks(2); #set num of reducers
 		//accept the hdfs input and output directory at run time
-		FileInputFormat.addInputPath(job, new Path(args[1]));
-		FileOutputFormat.setOutputPath(job, new Path(args[2]));
+		FileInputFormat.addInputPath(job, new Path(args[2]));
+		FileOutputFormat.setOutputPath(job, new Path(args[3]));
 		//Launch the job and wait for it to finish
 //		job.waitForCompletion(true);
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
