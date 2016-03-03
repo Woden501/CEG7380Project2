@@ -1,5 +1,5 @@
 hadoop fs -mkdir colbySnedekerProject2/input
-hadoop fs -put sample.txt colbySnedekerProject2/input
+hadoop fs -put input.txt colbySnedekerProject2/input
 
 mkdir matrixMultiplication_class
 javac -classpath /opt/hadoop/hadoop-core-1.2.1.jar:/lib/commons-cli-1.2.jar -d matrixMultiplication_class MatrixMultiplication.java
