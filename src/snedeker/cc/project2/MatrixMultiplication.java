@@ -114,7 +114,9 @@ public class MatrixMultiplication {
 			
 			for (Entry<Integer, ArrayList<Double>> entry : jOrderedValues.entrySet()) {
 				ArrayList<Double> values = entry.getValue();
-				sum += values.get(0) * values.get(1);
+				
+				if (values.size() == 2)
+					sum += values.get(0) * values.get(1);
 			}
 			
 			context.write(key, new DoubleWritable(sum));
